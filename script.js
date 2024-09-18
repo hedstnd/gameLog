@@ -477,7 +477,9 @@ function bsbBatBox(stats) {
 	noteData.innerText=notes.join("\n");
 	noteRow.append(noteData);
 	noteRow.style = "text-align: left !important;";
-	ret.append(noteRow);
+	if (notes.length > 0) {
+		ret.append(noteRow);
+	}
 	ret.className = "scrollable"
 	return ret;
 }
