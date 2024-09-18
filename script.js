@@ -441,8 +441,17 @@ function bsbBatBox(stats) {
 		if (stats.athletes[i].starter) {
 			nm.innerText = stats.athletes[i].batOrder + " ";
 		} else {
-			nm.innerText = "("+stats.athletes[i].notes[0].text.split("-")[0]+") ";//"";
-			notes.push(stats.athletes[i].notes[0].text);
+			console.log(stats.athletes[i]);
+			try {
+				if (stats.athletes[i].notes[0].type != "pitchingDecision") {
+					nm.innerText = "("+stats.athletes[i].notes[0].text.split("-")[0]+") ";//"";
+					notes.push(stats.athletes[i].notes[0].text);
+				} else {
+					nm.innerText = "";
+				}
+			} catch (err) {
+				nm.innerText = "";
+			}
 			// notes.appendChild(note);
 			nm.className = "reserve";
 		}
