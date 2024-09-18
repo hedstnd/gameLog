@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+	<link href="splashscreens/iphone5_splash.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+<link href="splashscreens/iphone6_splash.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+<link href="splashscreens/iphoneplus_splash.png" media="(device-width: 621px) and (device-height: 1104px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
+<link href="splashscreens/iphonex_splash.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
+<link href="splashscreens/iphonexr_splash.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+<link href="splashscreens/iphonexsmax_splash.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
+<link href="splashscreens/ipad_splash.png" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+<link href="splashscreens/ipadpro1_splash.png" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+<link href="splashscreens/ipadpro3_splash.png" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+<link href="splashscreens/ipadpro2_splash.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+  <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <title>GameLog</title>
+	<link rel="manifest" href="manifest.webmanifest" />
+	<link rel="apple-touch-icon" href="icon-512.png"/>
+  <link href="style.css" rel="stylesheet" type="text/css" />
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+</head>
+
+<body>
+	<script src="script.js" type="text/javascript"></script>
+	<span id="content">
+	<!--<a href="addGame/">--><button id="btn" onclick="setPg('adG')">Add Game</button><!--</a>-->
+		<span id="icons"></span>
+		<h1 id="header">Home</h1>
+	<select id="dropDown" onchange="setLg()">
+		<option value="" selected>Select a sport</option>
+		<option value="baseball">Baseball</option>
+		<option value="basketball">Basketball</option>
+		<option value="football">Football</option>
+		<option value="hockey">Hockey</option>
+		<option value="soccer">Soccer</option>
+	</select>
+	<select id="league" onchange="getGames()"><option value="" selected>Select a league</option></select>
+		<select id="teamSel" onchange="setYr()" class="add"><option value="">Select a Team</option></select>
+	<select id="regPost" class="add">
+		<option value=2>Regular Season</option>
+		<option value=1>Preseason</option>
+		<option value=3>Postseason</option>
+	</select>
+	<select id="season" class="add" onchange="findGames()"><option value="">Select Year</option></select>
+	<button onclick="findGames()" class="add" id="goBtn">Go</button>
+	<ul id="gameList"></ul>
+		</span>
+	<span id="set" hidden>
+		<h1>Settings</h1>
+		<ul>
+			<li><button onclick="clearAll()">Clear all games</button></li>
+			<li><button id="sBut" onclick="share()">Share GameLog</button></li>
+			<!--<li>Notifications (WIP)</li>-->
+		</ul>
+	</span>
+	<div id="scrolling">
+	<span id="bsbBox" hidden>
+		<div id="cls" onclick="hideBox(false)"></div>
+		<table class="lineScore"></table>
+		<table class="roadBox" id="awayBatting"></table>
+		<table class="roadBox" id="awayPitching"></table>
+		<table class="homeBox" id="homeBatting"></table>
+		<table class="homeBox" id="homePitching"></table>
+	</span>
+	</div>
+	<div id="bot-bar"><span id="hm" class="tab activeTab">Home</span><span id="adG" class="tab">Add Game</span><span id="rem" class="tab">Remove Game</span><span id="fou" class="tab">Settings</span></div>
+  <!--
+  This script places a badge on your repl's full-browser view back to your repl's cover
+  page. Try various colors for the theme: dark, light, red, orange, yellow, lime, green,
+  teal, blue, blurple, magenta, pink!
+  --
+  <script src="https://replit.com/public/js/replit-badge-v2.js" theme="dark" position="bottom-right"></script>-->
+</body>
+
+</html>

@@ -1,0 +1,311 @@
+html {
+  height: 100%;
+  width: 100%;
+}
+body {
+	font-family: Verdana, sans-serif;
+	background-color: #000;
+	color: #fff;
+	padding-bottom: .6rem;
+}
+button {
+	background-color: #2c2c2c;
+	color: #fff;
+	border-radius: 25px;
+}
+select {
+	border-radius: 25px;
+	background-color: #2c2c2c;
+	color: #fff;
+	display: block;
+}
+ul li {
+	border-bottom: 1px solid white;
+	list-style-type: none;
+	padding-top: .5rem;
+	padding-bottom: .5rem;
+	padding-right: 1.1rem;
+}
+li:last-child {
+	border:none;
+	padding-bottom: 6rem;
+}
+
+.addG {
+	border-radius: 5px;
+	margin-left: .5rem;
+}
+
+#bot-bar {
+	width: 100%;
+	position: fixed;
+	left: 0px;
+	bottom: 0px;
+	padding-bottom: 1.5rem;
+	height: 4rem;
+	backdrop-filter: blur(30px);
+	-webkit-backdrop-filter: blur(30px);
+	font-size: 3vw;
+	font-family: 'San Francisco';
+}
+#bot-bar .activeTab {
+	/*background-color: rgba(128,128,128,0.4);*/
+	color: blue;/*rgb(0,132,255);*/
+}
+.tab::after {
+	/*width: 25%;*/
+	content: " ";
+}
+.tab {
+	width: 25%;
+	text-align: center;
+	display: inline-block;
+	height: 100%;
+	padding-bottom: 1rem;
+}
+.add {
+	display: none;
+}
+#btn {
+	display: none;
+}
+@font-face {
+  font-family: "San Francisco";
+  font-weight: 400;
+  src: url("https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-regular-webfont.woff");
+}
+
+#hm::before {
+	content: "\e88a\A";
+	font-family: 'Material Symbols Outlined';
+	font-size: 2.5rem;
+}
+#adG::before {
+	content: "\e145\A";
+	font-family: 'Material Symbols Outlined';
+	font-size: 2.5rem;
+}
+#rem::before {
+	content: "\e872\A";
+	font-family: 'Material Symbols Outlined';
+	font-size: 2.5rem;
+}
+#fou::before {
+	content: "\e8b8\A";
+	font-family: 'Material Symbols Outlined';
+	font-size: 2.5rem;
+}
+
+#icons {
+	float: right;
+	color: white;
+}
+
+.baseball li::before {
+	content: "\ea51";
+	font-family: 'Material Symbols Outlined';
+	margin-left: -1rem;
+	/* font-size: 1.5rem; */
+}
+.football li::before{
+	content: "\ea29";
+	font-family: 'Material Symbols Outlined';
+	margin-left: -1rem;
+	/* font-size: 1.5rem; */
+}
+.basketball li::before{
+	content: "\ea26";
+	font-family: 'Material Symbols Outlined';
+	margin-left: -1rem;
+	/* font-size: 1.5rem; */
+}
+.hockey li::before{
+	content: "\ea2b";
+	font-family: 'Material Symbols Outlined';
+	margin-left: -1rem;
+	/* font-size: 1.5rem; */
+}
+
+
+@media only screen and (min-width: 768px) {
+	#bot-bar {
+		display: none;
+	}
+	select {
+		display: inline;
+	}
+	#btn {
+		display: inline;
+	}
+	.add {
+		display: none;
+	}
+	body {
+		margin-left: 0px !important;
+	}
+	#header {
+		display: none;
+	}
+}
+
+@media only screen and (max-width: 768px) {
+	select {
+		width: 80%;
+		height: 1.5rem;
+		margin-top: .75rem;
+		margin-left: auto;
+		margin-right: auto;
+	}
+	#goBtn {
+		margin-top: .5rem;
+		border-radius: 5px;
+		float: right;
+		width: 4rem;
+		height: 2rem;
+	}
+}
+@media screen and (display-mode: standalone) {
+  header {
+    height: 88px !important;
+  }
+}
+@media screen and (orientation: landscape) {
+	body {
+		margin-left: 4rem;
+	}
+	#bot-bar span {
+		display: block;
+		/*position: fixed;*/
+	/*	left: 0px;*/
+		height: 25%;
+	}
+	#bot-bar {
+		top: 0px;
+		width: 4rem;
+		height: 100%;
+		text-align: center;
+		
+	}
+	.tab {
+		display: block;
+		/*margin-top: -15%;*/
+		font-size: 1rem;
+		text-align: center;
+		
+	}
+	.tab:first-child {
+		margin-top: 10%;
+		margin-bottom: -50%
+	}
+}
+#set ul {
+	display: inline;
+}
+table,th,td {
+	border: 1px solid white;
+	border-collapse: collapse;
+	text-align: right;
+}
+table {
+	margin-left: auto;
+	margin-right: auto;
+}
+td:first-child {
+	text-align: left;
+}
+.reserve::before {
+	content: '\e941';
+	font-family: 'Material Symbols Outlined';
+}
+.dnp {
+	text-align: center;
+}
+.stP {
+	float: right;
+	font-size: 0.75rem;
+	color: gray;
+}
+#cls::before {
+	content: '\00d7';
+	font-size: 1.5rem;
+	float: right;
+}
+.scrollable {
+	overflow-x: scroll;
+	max-width: 95vw !important;
+	min-width: 10rem;
+	font-size: .75rem;
+	display: block;
+}
+#bsbBox {
+	padding-bottom: 5rem;
+	display: none;
+	transition: 0.35s all ease-in-out;
+	margin-left: 100vw;
+	margin-right: -100vw;
+}
+#bsbBox td {
+	max-width: 100%;
+	white-space: nowrap;
+}
+.line {
+	min-width: 50vw;
+	max-width: 95vw;;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.soccer li::before{
+	content: "\ea2f";
+	font-family: 'Material Symbols Outlined';
+	margin-left: -1rem;
+	/* font-size: 1.5rem; */
+}
+#noBul {
+	list-style-type: none;
+}
+.yellowCard {
+	color: yellow;
+}
+.redCard {
+	color: red;
+}
+.scoreGoal {
+	font-weight: bold;
+}
+.boldT {
+	font-weight: bold;
+}
+
+ul {
+	margin-left: -2rem;
+}
+.twoLines::after {
+	content: '\e5cc';
+	font-family: 'Material Symbols Outlined';
+	font-size: 1.75rem;
+	transform: translateY(-50%) !important;
+	right: 0px;
+	position: absolute;
+	display: inline;
+}
+.threeLines::after {
+	transform: translateY(-75%) !important;
+}
+.fourLines::after {
+	transform: translateY(-100%) !important;
+}
+#gameList li::after {
+	content: '\e5cc';
+	font-family: 'Material Symbols Outlined';
+	font-size: 1.75rem;
+	transform: translateY(-25%);
+	right: 0px;
+	position: absolute;
+	display: inline;
+}
+#content {
+	position: absolute;
+	min-width: 98%;
+	transition: 0.35s all ease-in-out;
+}
