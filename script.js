@@ -2,6 +2,7 @@
 // let lg = document.getElementById("league");
 // let dd = document.getElementById("dropDown");
 var games = new Object();
+var appVer = "2.0.1";
 g = [];
 d = new Date();
 window.onload = function() {
@@ -33,6 +34,9 @@ window.onload = function() {
 	games.basketball = JSON.parse(localStorage.getItem("basketball")) || [];
 	games.football = JSON.parse(localStorage.getItem("football")) || [];
 	games.soccer = JSON.parse(localStorage.getItem("soccer")) || [];
+	var version = document.createElement("p");
+	version.innerText = "GameLog " + appVer;
+	document.getElementById("set").appendChild(version);
 }
 games.nba = [];
 games.mlb = [];
@@ -115,7 +119,7 @@ function findGames() {
 			ins+= " ["+ game.events[i].competitions[0].notes[0].headline + "]";
 		}
 				ins+=" - "+new Date(game.events[i].competitions[0].date).toLocaleDateString();
-		ins+= /*" (<a href=\""+game.events[i].links[0].href+"\" target=\"blank\">ESPN</a>)*/"<button class=\"addG\" onclick=\"addGame('"+ins.substring(0,ins.length - 12)+"','"+game.events[i].date+"','"+sport+"','"+league+"','"+game.events[i].id+"')\"";
+		ins+= /*" (<a href=\""+game.events[i].links[0].href+"\" target=\"blank\">ESPN</a>)*/"<button class=\"addG\" onclick=\"addGame('"+ins.split(" - ")[0]+"','"+game.events[i].date+"','"+sport+"','"+league+"','"+game.events[i].id+"')\"";
 				if (games[sport].filter(e =>  e.url.split("=")[1] == game.events[i].id).length > 0) {
 					ins+=" disabled>Already Added!";
 				} else {
