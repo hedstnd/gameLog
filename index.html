@@ -28,7 +28,7 @@
 	<!--<a href="addGame/">--><button id="btn" onclick="setPg('adG')">Add Game</button><!--</a>-->
 		<span id="icons"></span>
 		<h1 id="header">Home</h1>
-	<select id="dropDown" onchange="setLg()">
+	<select id="dropDown" onchange="getGames()">
 		<option value="" selected>Select a sport</option>
 		<option value="baseball">Baseball</option>
 		<option value="basketball">Basketball</option>
@@ -36,7 +36,7 @@
 		<option value="hockey">Hockey</option>
 		<option value="soccer">Soccer</option>
 	</select>
-	<select id="league" onchange="getGames()"><option value="" selected>Select a league</option></select>
+	<select id="league" onchange="getGames()" style = "display:none"><option value="" selected>Select a league</option></select>
 		<select id="teamSel" onchange="setYr()" class="add"><option value="">Select a Team</option></select>
 	<select id="regPost" class="add">
 		<option value=2>Regular Season</option>

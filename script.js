@@ -114,9 +114,9 @@ function findGames() {
 		if (game.events[i].competitions[0].notes && game.events[i].competitions[0].notes[0]) {
 			ins+= " ["+ game.events[i].competitions[0].notes[0].headline + "]";
 		}
-				ins+=" - "+game.events[i].competitions[0].date.substring(0,10);
-		ins+= /*" (<a href=\""+game.events[i].links[0].href+"\" target=\"blank\">ESPN</a>)*/"<button class=\"addG\" onclick=\"addGame('"+league+"','"+game.events[i].id+"')\"";
-				if (games[league.replaceAll("-","")].includes(game.events[i].id)) {
+				ins+=" - "+new Date(game.events[i].competitions[0].date).toLocaleDateString();
+		ins+= /*" (<a href=\""+game.events[i].links[0].href+"\" target=\"blank\">ESPN</a>)*/"<button class=\"addG\" onclick=\"addGame('"+ins.substring(0,ins.length - 12)+"','"+game.events[i].date+"','"+sport+"','"+league+"','"+game.events[i].id+"')\"";
+				if (games[sport].filter(e =>  e.url.split("=")[1] == game.events[i].id).length > 0) {
 					ins+=" disabled>Already Added!";
 				} else {
 					ins+= ">Add Game";
@@ -214,7 +214,21 @@ async function printGames(sport,league="") {
 			
 		}
 	} else {
-		
+		var dispGames = games[sport];
+		console.log(dispGames);
+		for (var i = 0; i < dispGames.length; i++) {
+			var gD = new Date(dispGames[i].time).toLocaleDateString();
+			var item = document.createElement("li");
+			item.innerText = gD + " - " + dispGames[i].displayName;
+			item.id = dispGames[i].url.split("=")[1];
+			if (document.getElementsByClassName("activeTab").length > 0 && document.getElementsByClassName("activeTab")[0].id == "rem") {
+				item.innerHTML+="<button onclick=\"remove('"+sport+"','"+dispGames[i].url+"')\">Remove Game</button>";
+			} else {
+				// ins+="<button onclick=\"showBox('"+url+"')\">Show Box Score</button>";
+			item.setAttribute("onclick","showBox(\""+dispGames[i].url+"\")");
+			}
+			gameList.appendChild(item);
+		}
 	}
 }
 async function findTeams() {
@@ -261,17 +275,22 @@ async function findTeams() {
 	//}
 	// g.send()
 }
-function addGame(league,id) {
-	b = document.getElementById(id).children[0];
+function addGame(title, time, sport, league,id) {
+	b = document.getElementById("" + id).children[0];
 	b.setAttribute("disabled","true");
 	b.innerText = "Added!";
-	league = league.replaceAll("-","");
-	if (!games[league].includes(id)) {
-			games[league].push(id);
-	}
-	games[league] = games[league].sort(function(a,b){return parseInt(a) - parseInt(b)});
-	localStorage[league] = games[league];
+	// league = league.replaceAll("-","");
+	// if (!games[league].includes(id)) {
+			// games[league].push(id);
+	// }
+	// games[league] = games[league].sort(function(a,b){return parseInt(a) - parseInt(b)});
+	// localStorage[league] = games[league];
 	//document.cookie = league+"="+games[league]+";expires="+d.toUTCString()+";path=/";
+	if (games[sport].filter(e => e.time == time).length == 0) {
+		games[sport].push(new Game(title,time,sport,league,id));
+		games[sport] = games[sport].sort(function(a,b) {return new Date(a.time) - new Date(b.time)})
+		localStorage.setItem(sport,JSON.stringify(games[sport]));
+	}
 }
 function setActive(id) {
 	if (id.id != 'fou') {
@@ -304,6 +323,8 @@ function setPg(mode) {
 		document.getElementById("league").setAttribute("onchange","findTeams()");
 		document.getElementById("teamSel").value="";
 		document.getElementById("season").value="";
+		document.getElementById("dropDown").setAttribute("onchange","setLg()");
+		document.getElementById("league").style = "";
 	} else if (mode =="hm") {
 		document.getElementById("header").innerText = 'Home';
 		document.getElementById('set').setAttribute("hidden","true");
@@ -313,7 +334,9 @@ function setPg(mode) {
 		document.getElementById("btn").setAttribute("onclick","setPg('adG')");
 		document.getElementById("btn").innerText="Add Game";
 		document.getElementById("btn").style.fontFamily = "Verdana, sans-serif";
-		document.getElementById("league").setAttribute("onchange","getGames()");
+		document.getElementById("league").style.display = "none";
+		document.getElementById("dropDown").setAttribute("onchange","getGames()")
+		// document.getElementById("league").setAttribute("onchange","getGames()");
 	} else if (mode=="rem") {
 		setPg('hm');
 		document.getElementById("header").innerText = 'Remove Games';
@@ -322,13 +345,13 @@ function setPg(mode) {
 		document.getElementById("set").removeAttribute("hidden");
 	}
 }
-function remove(league, id) {
-	league = league.replaceAll("-","");
-	sure = confirm("Are you sure you want to remove this game?");
-	ind = games[league].indexOf(id);
+function remove(sport, url) {
+	// league = league.replaceAll("-","");
+	var sure = confirm("Are you sure you want to remove this game?");
+	ind = games[sport].findIndex(e => e.url == url);
 	if (ind >=0 && sure) {
-		games[league].splice(ind,1);
-		document.getElementById(id).style.display="none";
+		games[sport].splice(ind,1);
+		document.getElementById(url.split("=")[1]).style.display="none";
 	}
 	localStorage[league] = games[league];
 }
