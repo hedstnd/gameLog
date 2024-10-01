@@ -309,3 +309,16 @@ ul {
 	min-width: 98%;
 	transition: 0.35s all ease-in-out;
 }
+@media (prefers-color-scheme: light) {
+	body {
+		background-color: white;
+		color: black;
+	}
+	table, th, td {
+		border: 1px solid black;
+	}
+	button, select {
+		background-color: #d3d3d3;
+		color: black;
+	}
+}

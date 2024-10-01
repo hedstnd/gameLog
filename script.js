@@ -28,6 +28,11 @@ window.onload = function() {
 	for (var i = 0; i < tabs.length; i++) {
 		tabs[i].setAttribute("onclick","setActive("+tabs[i].id+")");
 	}
+	games.baseball = JSON.parse(localStorage.getItem("baseball")) || [];
+	games.hockey = JSON.parse(localStorage.getItem("hockey")) || [];
+	games.basketball = JSON.parse(localStorage.getItem("basketball")) || [];
+	games.football = JSON.parse(localStorage.getItem("football")) || [];
+	games.soccer = JSON.parse(localStorage.getItem("soccer")) || [];
 }
 games.nba = [];
 games.mlb = [];
@@ -129,77 +134,87 @@ function findGames() {
 function getGames() {
 	printGames(document.getElementById("dropDown").value,document.getElementById("league").value);
 }
-async function printGames(sport,league) {
+async function printGames(sport,league="") {
 	document.getElementById("gameList").className = document.getElementById("dropDown").value;
 	gms = games[league.replaceAll("-","")];
 	document.getElementById("gameList").innerHTML="";
 	// console.log(gms);
 	g = [];
-	for (var i = 0; i < gms.length; i++) {
-		// console.log(league);
-		g.push(new XMLHttpRequest());
-		var game;
-		url = "https://site.api.espn.com/apis/site/v2/sports/"+sport+"/"+league+"/summary?event="+gms[i];
-		 var e = await fetch(url);//.then(response => {
-		// 	game = response.json();
-		// })
-		game = await e.json();
-		console.log(game);
-		ins = "";
-		// /*game = await makeRequest*/g[i].open("GET","https://site.api.espn.com/apis/site/v2/sports/"+sport+"/"+league+"/summary?event="+gms[i]);
-		item = document.createElement("li");
-		// g[i].responseType='json';
-		// g[i].onload = function() {
-		// console.log(g);
-		// game=g[i].response;
-		// console.log(game);
-		if (league.includes("college") && (league.includes("basket") || league.includes("foot"))) {
-			ins = game.header.competitions[0].date.substring(0,10) + " - " + game.header.competitions[0].competitors[1].team.nickname + " " + game.header.competitions[0].competitors[1].score;
-			if (game.header.competitions[0].neutralSite) {
-				ins+= " vs ";
+	if (league.length > 0) {
+		for (var i = 0; i < gms.length; i++) {
+			// console.log(league);
+			g.push(new XMLHttpRequest());
+			var game;
+			url = "https://site.api.espn.com/apis/site/v2/sports/"+sport+"/"+league+"/summary?event="+gms[i];
+			 var e = await fetch(url);//.then(response => {
+			// 	game = response.json();
+			// })
+			game = await e.json();
+			console.log(game);
+			ins = "";
+			// /*game = await makeRequest*/g[i].open("GET","https://site.api.espn.com/apis/site/v2/sports/"+sport+"/"+league+"/summary?event="+gms[i]);
+			item = document.createElement("li");
+			// g[i].responseType='json';
+			// g[i].onload = function() {
+			// console.log(g);
+			// game=g[i].response;
+			// console.log(game);
+			if (league.includes("college") && (league.includes("basket") || league.includes("foot"))) {
+				ins = game.header.competitions[0].date.substring(0,10) + " - " + game.header.competitions[0].competitors[1].team.nickname + " " + game.header.competitions[0].competitors[1].score;
+				if (game.header.competitions[0].neutralSite) {
+					ins+= " vs ";
+				} else {
+					ins+= " @ ";
+				}
+				ins+= game.header.competitions[0].competitors[0].team.nickname + " " + game.header.competitions[0].competitors[0].score;
 			} else {
-				ins+= " @ ";
+				ins = game.header.competitions[0].date.substring(0,10) + " - " + game.header.competitions[0].competitors[1].team.name + " " + game.header.competitions[0].competitors[1].score;
+				if (game.header.competitions[0].neutralSite) {
+					ins+= " vs ";
+				} else {
+					ins+= " @ ";
+				}
+				ins+= game.header.competitions[0].competitors[0].team.name + " " + game.header.competitions[0].competitors[0].score;
 			}
-			ins+= game.header.competitions[0].competitors[0].team.nickname + " " + game.header.competitions[0].competitors[0].score;
-		} else {
-			ins = game.header.competitions[0].date.substring(0,10) + " - " + game.header.competitions[0].competitors[1].team.name + " " + game.header.competitions[0].competitors[1].score;
-			if (game.header.competitions[0].neutralSite) {
-				ins+= " vs ";
+			if (game.header.gamenotes) {
+				ins+= " ["+ game.header.gamenotes + "]";
+			} else if (game.header.gameNote) {
+				ins+= " [" + game.header.gameNote + "]";
+			}
+			// ins+= " (<a href=\""+game.header.links[0].href+"\" target=\"blank\">ESPN</a>)";
+			// ins="";
+			if (document.getElementsByClassName("activeTab").length > 0 && document.getElementsByClassName("activeTab")[0].id == "rem") {
+				ins+="<button onclick=\"remove('"+league+"','"+game.header.id+"')\">Remove Game</button>";
 			} else {
-				ins+= " @ ";
+				// ins+="<button onclick=\"showBox('"+url+"')\">Show Box Score</button>";
+			item.setAttribute("onclick","showBox(\""+url+"\")");
 			}
-			ins+= game.header.competitions[0].competitors[0].team.name + " " + game.header.competitions[0].competitors[0].score;
+				item.innerHTML = ins;
+			item.id = game.header.id;
+			document.getElementById("gameList").appendChild(item);
+			setTimeout(() => {
+			if (item.clientHeight > 170) {
+				item.className = 'fourLines';
+				console.log(item.clientHeight);
+			} else if (item.clientHeight > 150) {//(item.innerText.length > 73) {
+				item.className = 'threeLines';
+				console.log(item.clientHeight);
+			} else if (item.innerText.length > 42) {
+				item.className = 'twoLines';
+			}
+			},2);
+			// }
+			// console.log("sending");
+			// g[i].send();
+			if (games[sport].filter(e => e.time == game.header.competitions[0].date).length == 0) {
+				games[sport].push(new Game(ins.substring(13),game.header.competitions[0].date,sport,league,game.header.competitions[0].id));
+				games[sport] = games[sport].sort(function(a,b) {return new Date(a.time) - new Date(b.time)})
+				localStorage.setItem(sport,JSON.stringify(games[sport]));
+			}
+			
 		}
-		if (game.header.gamenotes) {
-			ins+= " ["+ game.header.gamenotes + "]";
-		} else if (game.header.gameNote) {
-			ins+= " [" + game.header.gameNote + "]";
-		}
-		// ins+= " (<a href=\""+game.header.links[0].href+"\" target=\"blank\">ESPN</a>)";
-		// ins="";
-		if (document.getElementsByClassName("activeTab").length > 0 && document.getElementsByClassName("activeTab")[0].id == "rem") {
-			ins+="<button onclick=\"remove('"+league+"','"+game.header.id+"')\">Remove Game</button>";
-		} else {
-			// ins+="<button onclick=\"showBox('"+url+"')\">Show Box Score</button>";
-		item.setAttribute("onclick","showBox(\""+url+"\")");
-		}
-			item.innerHTML = ins;
-		item.id = game.header.id;
-		document.getElementById("gameList").appendChild(item);
-		setTimeout(() => {
-		if (item.clientHeight > 170) {
-			item.className = 'fourLines';
-			console.log(item.clientHeight);
-		} else if (item.clientHeight > 150) {//(item.innerText.length > 73) {
-			item.className = 'threeLines';
-			console.log(item.clientHeight);
-		} else if (item.innerText.length > 42) {
-			item.className = 'twoLines';
-		}
-		},2);
-		// }
-		// console.log("sending");
-		// g[i].send();
+	} else {
+		
 	}
 }
 async function findTeams() {
@@ -616,4 +631,10 @@ function soccerBox(stats) {
 		ret.appendChild(it);
 	}
 	return ret;
+}
+
+function Game(title, time, sport, league, id) {
+	this.displayName = title;
+	this.time = time;
+	this.url = "https://site.api.espn.com/apis/site/v2/sports/"+sport+"/"+league+"/summary?event="+id;
 }
