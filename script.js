@@ -115,8 +115,9 @@ function findGames() {
 			} else {
 			ins += game.events[i].competitions[0].competitors[1].team.shortDisplayName + " " + game.events[i].competitions[0].competitors[1].score.value + " @ " + game.events[i].competitions[0].competitors[0].team.shortDisplayName + " " + game.events[i].competitions[0].competitors[0].score.value;
 			}
+		// var aposRemove = false;
 		if (game.events[i].competitions[0].notes && game.events[i].competitions[0].notes[0]) {
-			ins+= " ["+ game.events[i].competitions[0].notes[0].headline + "]";
+			ins+= (" ["+ game.events[i].competitions[0].notes[0].headline + "]").replaceAll("'","’").replaceAll(" - "," ");
 		}
 				ins+=" - "+new Date(game.events[i].competitions[0].date).toLocaleDateString();
 		ins+= /*" (<a href=\""+game.events[i].links[0].href+"\" target=\"blank\">ESPN</a>)*/"<button class=\"addG\" onclick=\"addGame('"+ins.split(" - ")[0]+"','"+game.events[i].date+"','"+sport+"','"+league+"','"+game.events[i].id+"')\"";
@@ -128,6 +129,7 @@ function findGames() {
 				ins+= "</button>";
 		item = document.createElement("li");
 		item.innerHTML = ins;
+		// item.innerText = item.innerText.replaceAll("`","'");
 		item.id = game.events[i].id;
 		document.getElementById("gameList").appendChild(item);
 		}}
