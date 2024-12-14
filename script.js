@@ -2,7 +2,7 @@
 // let lg = document.getElementById("league");
 // let dd = document.getElementById("dropDown");
 var games = new Object();
-var appVer = "2.0.1";
+var appVer = "2.0.3";
 g = [];
 d = new Date();
 window.onload = function() {
