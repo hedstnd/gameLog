@@ -2,7 +2,7 @@
 // let lg = document.getElementById("league");
 // let dd = document.getElementById("dropDown");
 var games = new Object();
-var appVer = "2.0.3";
+var appVer = "2.0.4";
 g = [];
 d = new Date();
 window.onload = function() {
@@ -359,7 +359,7 @@ function remove(sport, url) {
 		games[sport].splice(ind,1);
 		document.getElementById(url.split("=")[1]).style.display="none";
 	}
-	localStorage[league] = games[league];
+	localStorage[sport] = JSON.stringify(games[sport]);
 }
 function clearAll() {
 	del = confirm("Are you sure you want to delete all games from memory?\nThis cannot be undone.");
@@ -451,6 +451,9 @@ function createBox(stats) {
 		if (stats.athletes[i].didNotPlay) {
 			dnp = document.createElement("td");
 			dnp.innerText = "DNP";
+			if (stats.athletes[i].reason) {
+				dnp.innerText += " - " + stats.athletes[i].reason;
+			}
 			dnp.className = "dnp";
 			dnp.setAttribute("colspan",stats.names.length + "");
 			ath.appendChild(dnp);
