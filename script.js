@@ -2,7 +2,7 @@
 // let lg = document.getElementById("league");
 // let dd = document.getElementById("dropDown");
 var games = new Object();
-var appVer = "2.1.0";
+var appVer = "2.1.1";
 g = [];
 d = new Date();
 window.onload = function() {
@@ -952,6 +952,16 @@ function getWinLossInfo(competitors) {
 	var retStr = "";
 	var win = competitors.filter(e => e.winner)[0];
 	var loss = competitors.filter(e => !e.winner)[0];
-	retStr+= win.id + "','"+win.team.logos[0].href+"','"+loss.id+"','"+loss.team.logos[0].href;
+	try {
+		retStr+= win.id + "','"+win.team.logos[0].href;
+	} catch (err) {
+		retStr+= win.id+"','null";
+	}
+	retStr+= "','";
+	try {
+		retStr+= loss.id+"','"+loss.team.logos[0].href;
+	} catch (err) {
+		retStr+= loss.id+"','null";
+	}
 	return retStr;
 }
