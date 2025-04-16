@@ -53,8 +53,13 @@
 			<li><button onclick="clearAll()">Clear all games</button></li>
 			<li><button id="sBut" onclick="share()">Share GameLog</button></li>
 			<li><button onclick="window.location.reload(true)">Update/Reload</button></li>
+			<li><button onclick="convertOldGames()">Add Win/Loss Data for Old Games</button>
 			<!--<li>Notifications (WIP)</li>-->
 		</ul>
+	</span>
+	<span id="recs" hidden>
+		<h1>Team Records</h1>
+		<span id="teamWL"></span>
 	</span>
 	<div id="scrolling">
 	<span id="bsbBox" hidden>
@@ -66,7 +71,7 @@
 		<table class="homeBox" id="homePitching"></table>
 	</span>
 	</div>
-	<div id="bot-bar"><span id="hm" class="tab activeTab">Home</span><span id="adG" class="tab">Add Game</span><span id="rem" class="tab">Remove Game</span><span id="fou" class="tab">Settings</span></div>
+	<div id="bot-bar"><span id="hm" class="tab activeTab">Home</span><span id="adG" class="tab">Add Game</span><span id="winLoss" class="tab">Records</span><span id="rem" class="tab">Remove Game</span><span id="fou" class="tab">Settings</span></div>
   <!--
   This script places a badge on your repl's full-browser view back to your repl's cover
   page. Try various colors for the theme: dark, light, red, orange, yellow, lime, green,

@@ -57,7 +57,7 @@ li:last-child {
 	content: " ";
 }
 .tab {
-	width: 25%;
+	width: 20%;
 	text-align: center;
 	display: inline-block;
 	height: 100%;
@@ -321,4 +321,40 @@ ul {
 		background-color: #d3d3d3;
 		color: black;
 	}
+}
+#winLoss::before {
+	content: "\f20c\A";
+	font-family: 'Material Symbols Outlined';
+	font-size: 2.5rem;
+}
+.recTile {
+	width: 46dvw;
+	height: 46dvw;
+	margin: auto;
+}
+.recTile img {
+	width: 30dvw;
+	height: auto;
+	margin-left: 8dvw;
+	margin-right: 8dvw;
+}
+.recTile p {
+	margin: auto;
+	text-align: center;
+}
+#teamWL {
+	width: 100%;
+	display: block;
+	font-family: "san Francisco";
+	margin-bottom: 10dvh !important;
+	margin:auto;
+	display: flex;
+	flex-wrap: wrap;
+}
+/* #teamWL br { */
+  /* flex-basis: 100%; */
+  /* width: 0; */
+/* } */
+#teamWL h3 {
+	width: 100%;
 }

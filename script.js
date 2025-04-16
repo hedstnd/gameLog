@@ -2,7 +2,7 @@
 // let lg = document.getElementById("league");
 // let dd = document.getElementById("dropDown");
 var games = new Object();
-var appVer = "2.0.4";
+var appVer = "2.1.0";
 g = [];
 d = new Date();
 window.onload = function() {
@@ -37,6 +37,7 @@ window.onload = function() {
 	var version = document.createElement("p");
 	version.innerText = "GameLog " + appVer;
 	document.getElementById("set").appendChild(version);
+	findTeamRecs();
 }
 games.nba = [];
 games.mlb = [];
@@ -120,7 +121,7 @@ function findGames() {
 			ins+= (" ["+ game.events[i].competitions[0].notes[0].headline + "]").replaceAll("'","’").replaceAll(" - "," ");
 		}
 				ins+=" - "+new Date(game.events[i].competitions[0].date).toLocaleDateString();
-		ins+= /*" (<a href=\""+game.events[i].links[0].href+"\" target=\"blank\">ESPN</a>)*/"<button class=\"addG\" onclick=\"addGame('"+ins.split(" - ")[0]+"','"+game.events[i].date+"','"+sport+"','"+league+"','"+game.events[i].id+"')\"";
+		ins+= /*" (<a href=\""+game.events[i].links[0].href+"\" target=\"blank\">ESPN</a>)*/"<button class=\"addG\" onclick=\"addGame('"+ins.split(" - ")[0]+"','"+game.events[i].date+"','"+sport+"','"+league+"','"+game.events[i].id+"','"+getWinLossInfo(game.events[i].competitions[0].competitors)+"')\"";
 				if (games[sport].filter(e =>  e.url.split("=")[1] == game.events[i].id).length > 0) {
 					ins+=" disabled>Already Added!";
 				} else {
@@ -213,7 +214,8 @@ async function printGames(sport,league="") {
 			// console.log("sending");
 			// g[i].send();
 			if (games[sport].filter(e => e.time == game.header.competitions[0].date).length == 0) {
-				games[sport].push(new Game(ins.substring(13),game.header.competitions[0].date,sport,league,game.header.competitions[0].id));
+				var winInfo = getWinLossInfo(game.header.competitions[0].competitors).split("','");
+				games[sport].push(new Game(ins.substring(13),game.header.competitions[0].date,sport,league,game.header.competitions[0].id,winInfo[0],winInfo[1],winInfo[2],winInfo[3]));
 				games[sport] = games[sport].sort(function(a,b) {return new Date(a.time) - new Date(b.time)})
 				localStorage.setItem(sport,JSON.stringify(games[sport]));
 			}
@@ -281,7 +283,7 @@ async function findTeams() {
 	//}
 	// g.send()
 }
-function addGame(title, time, sport, league,id) {
+function addGame(title, time, sport, league,id, winnerId, winnerURL, loserId, loserURL) {
 	b = document.getElementById("" + id).children[0];
 	b.setAttribute("disabled","true");
 	b.innerText = "Added!";
@@ -293,13 +295,13 @@ function addGame(title, time, sport, league,id) {
 	// localStorage[league] = games[league];
 	//document.cookie = league+"="+games[league]+";expires="+d.toUTCString()+";path=/";
 	if (games[sport].filter(e => e.time == time).length == 0) {
-		games[sport].push(new Game(title,time,sport,league,id));
+		games[sport].push(new Game(title,time,sport,league,id,winnerId,winnerURL,loserId,loserURL));
 		games[sport] = games[sport].sort(function(a,b) {return new Date(a.time) - new Date(b.time)})
 		localStorage.setItem(sport,JSON.stringify(games[sport]));
 	}
 }
 function setActive(id) {
-	if (id.id != 'fou') {
+	if (id.id != 'fou' && id.id != "winLoss") {
 		hideBox();
 	}
 	document.getElementById("icons").className="";
@@ -313,10 +315,14 @@ function setActive(id) {
 }
 
 function setPg(mode) {
+	console.log(mode);
 	document.getElementById("dropDown").value="";
 	document.getElementById("league").value="";
 	document.getElementById("gameList").innerHTML="";
 	document.getElementById("season").value="";
+	if (mode != "winLoss") {
+		document.getElementById("recs").setAttribute("hidden","true");
+	}
 	if (mode =="adG") {
 		document.getElementById("header").innerText = 'Add Game';
 		document.getElementById('set').setAttribute("hidden","true");
@@ -350,6 +356,12 @@ function setPg(mode) {
 		document.getElementById('content').setAttribute("hidden","true");
 		document.getElementById("set").removeAttribute("hidden");
 	}
+	else if(mode=="winLoss") {
+		findTeamRecs();
+		document.getElementById("set").setAttribute("hidden","true");
+		document.getElementById('content').setAttribute("hidden","true");
+		document.getElementById("recs").removeAttribute("hidden");
+	}
 }
 function remove(sport, url) {
 	// league = league.replaceAll("-","");
@@ -365,6 +377,159 @@ function clearAll() {
 	del = confirm("Are you sure you want to delete all games from memory?\nThis cannot be undone.");
 	if (del) {
 		localStorage.clear();
+	}
+}
+function findTeamRecs() {
+	document.getElementById("teamWL").innerHTML = "";
+	if (games.baseball.length > 0) {
+		var bsbHead = document.createElement("h3");
+		bsbHead.innerText = "Baseball";
+		document.getElementById("teamWL").append(bsbHead,document.createElement("br"));
+		var teamsSeen;
+		var compatGames = games.baseball.filter(e => e.winner || e.loser);
+		teamsSeen = compatGames.map(e => e.winner.id || -1).filter(e => e != -1).concat(compatGames.map(e => e.loser.id || -1).filter(e => e != -1));
+		teamsSeen = [...new Set(teamsSeen)];
+		var winners = games.baseball.map(e => e.winner || -1).filter(e => e != -1);
+		var losers = games.baseball.map(e => e.loser || -1).filter(e => e != -1);
+		for (var i = 0; i < teamsSeen.length; i++) {
+			var tmFrame = document.createElement("div");
+			tmFrame.className = "recTile";
+			var tmImg = document.createElement("img");
+			var tmRec = document.createElement("p");
+			var wins = winners.filter(e => e.id == teamsSeen[i]).length;
+			var losses = losers.filter(e => e.id == teamsSeen[i]).length;
+			if (wins > 0) {
+				tmImg.src = winners.filter(e => e.id == teamsSeen[i])[0].logoURL;
+			} else {
+				tmImg.src = losers.filter(e => e.id == teamsSeen[i])[0].logoURL;
+			}
+			if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+				tmImg.src = tmImg.src.replace("500","500-dark");
+			}
+			tmRec.innerText = wins + "-" + losses;
+			tmFrame.append(tmImg,tmRec);
+			document.getElementById("teamWL").appendChild(tmFrame);
+		}
+	}
+	if (games.basketball.length > 0) {
+		var bsbHead = document.createElement("h3");
+		bsbHead.innerText = "Basketball";
+		document.getElementById("teamWL").append(bsbHead,document.createElement("br"));
+		var teamsSeen;
+		var compatGames = games.basketball.filter(e => e.winner || e.loser);
+		teamsSeen = compatGames.map(e => e.winner.id || -1).filter(e => e != -1).concat(compatGames.map(e => e.loser.id || -1).filter(e => e != -1));
+		teamsSeen = [...new Set(teamsSeen)];
+		var winners = games.basketball.map(e => e.winner || -1).filter(e => e != -1);
+		var losers = games.basketball.map(e => e.loser || -1).filter(e => e != -1);
+		for (var i = 0; i < teamsSeen.length; i++) {
+			var tmFrame = document.createElement("div");
+			tmFrame.className = "recTile";
+			var tmImg = document.createElement("img");
+			var tmRec = document.createElement("p");
+			var wins = winners.filter(e => e.id == teamsSeen[i]).length;
+			var losses = losers.filter(e => e.id == teamsSeen[i]).length;
+			if (wins > 0) {
+				tmImg.src = winners.filter(e => e.id == teamsSeen[i])[0].logoURL;
+			} else {
+				tmImg.src = losers.filter(e => e.id == teamsSeen[i])[0].logoURL;
+			}
+			if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+				tmImg.src = tmImg.src.replace("500","500-dark");
+			}
+			tmRec.innerText = wins + "-" + losses;
+			tmFrame.append(tmImg,tmRec);
+			document.getElementById("teamWL").appendChild(tmFrame);
+		}
+	}
+	if (games.football.length > 0) {
+		var bsbHead = document.createElement("h3");
+		bsbHead.innerText = "Football";
+		document.getElementById("teamWL").append(bsbHead,document.createElement("br"));
+		var teamsSeen;
+		var compatGames = games.football.filter(e => e.winner || e.loser);
+		teamsSeen = compatGames.map(e => e.winner.id || -1).filter(e => e != -1).concat(compatGames.map(e => e.loser.id || -1).filter(e => e != -1));
+		teamsSeen = [...new Set(teamsSeen)];
+		var winners = games.football.map(e => e.winner || -1).filter(e => e != -1);
+		var losers = games.football.map(e => e.loser || -1).filter(e => e != -1);
+		for (var i = 0; i < teamsSeen.length; i++) {
+			var tmFrame = document.createElement("div");
+			tmFrame.className = "recTile";
+			var tmImg = document.createElement("img");
+			var tmRec = document.createElement("p");
+			var wins = winners.filter(e => e.id == teamsSeen[i]).length;
+			var losses = losers.filter(e => e.id == teamsSeen[i]).length;
+			if (wins > 0) {
+				tmImg.src = winners.filter(e => e.id == teamsSeen[i])[0].logoURL;
+			} else {
+				tmImg.src = losers.filter(e => e.id == teamsSeen[i])[0].logoURL;
+			}
+			if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+				tmImg.src = tmImg.src.replace("500","500-dark");
+			}
+			tmRec.innerText = wins + "-" + losses;
+			tmFrame.append(tmImg,tmRec);
+			document.getElementById("teamWL").appendChild(tmFrame);
+		}
+	}
+	if (games.hockey.length > 0) {
+		var bsbHead = document.createElement("h3");
+		bsbHead.innerText = "Hockey";
+		document.getElementById("teamWL").append(bsbHead,document.createElement("br"));
+		var teamsSeen;
+		var compatGames = games.hockey.filter(e => e.winner || e.loser);
+		teamsSeen = compatGames.map(e => e.winner.id || -1).filter(e => e != -1).concat(compatGames.map(e => e.loser.id || -1).filter(e => e != -1));
+		teamsSeen = [...new Set(teamsSeen)];
+		var winners = games.hockey.map(e => e.winner || -1).filter(e => e != -1);
+		var losers = games.hockey.map(e => e.loser || -1).filter(e => e != -1);
+		for (var i = 0; i < teamsSeen.length; i++) {
+			var tmFrame = document.createElement("div");
+			tmFrame.className = "recTile";
+			var tmImg = document.createElement("img");
+			var tmRec = document.createElement("p");
+			var wins = winners.filter(e => e.id == teamsSeen[i]).length;
+			var losses = losers.filter(e => e.id == teamsSeen[i]).length;
+			if (wins > 0) {
+				tmImg.src = winners.filter(e => e.id == teamsSeen[i])[0].logoURL;
+			} else {
+				tmImg.src = losers.filter(e => e.id == teamsSeen[i])[0].logoURL;
+			}
+			if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+				tmImg.src = tmImg.src.replace("500","500-dark");
+			}
+			tmRec.innerText = wins + "-" + losses;
+			tmFrame.append(tmImg,tmRec);
+			document.getElementById("teamWL").appendChild(tmFrame);
+		}
+	}
+	if (games.soccer.length > 0) {
+		var bsbHead = document.createElement("h3");
+		bsbHead.innerText = "Soccer";
+		document.getElementById("teamWL").append(bsbHead,document.createElement("br"));
+		var teamsSeen;
+		var compatGames = games.soccer.filter(e => e.winner || e.loser);
+		teamsSeen = compatGames.map(e => e.winner.id || -1).filter(e => e != -1).concat(compatGames.map(e => e.loser.id || -1).filter(e => e != -1));
+		teamsSeen = [...new Set(teamsSeen)];
+		var winners = games.soccer.map(e => e.winner || -1).filter(e => e != -1);
+		var losers = games.soccer.map(e => e.loser || -1).filter(e => e != -1);
+		for (var i = 0; i < teamsSeen.length; i++) {
+			var tmFrame = document.createElement("div");
+			tmFrame.className = "recTile";
+			var tmImg = document.createElement("img");
+			var tmRec = document.createElement("p");
+			var wins = winners.filter(e => e.id == teamsSeen[i]).length;
+			var losses = losers.filter(e => e.id == teamsSeen[i]).length;
+			if (wins > 0) {
+				tmImg.src = winners.filter(e => e.id == teamsSeen[i])[0].logoURL;
+			} else {
+				tmImg.src = losers.filter(e => e.id == teamsSeen[i])[0].logoURL;
+			}
+			if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+				tmImg.src = tmImg.src.replace("500","500-dark");
+			}
+			tmRec.innerText = wins + "-" + losses;
+			tmFrame.append(tmImg,tmRec);
+			document.getElementById("teamWL").appendChild(tmFrame);
+		}
 	}
 }
 function createLineScore(sport,teams) {
@@ -665,8 +830,128 @@ function soccerBox(stats) {
 	return ret;
 }
 
-function Game(title, time, sport, league, id) {
+function Game(title, time, sport, league, id, winnerId, winnerURL, loserId,loserURL) {
 	this.displayName = title;
 	this.time = time;
 	this.url = "https://site.api.espn.com/apis/site/v2/sports/"+sport+"/"+league+"/summary?event="+id;
+	if (winnerId && loserId) {
+		var winner = new Object;
+		winner.id=winnerId;
+		winner.logoURL = winnerURL;
+		var loser = new Object();
+		loser.id=loserId;
+		loser.logoURL = loserURL;
+		this.winner = winner;
+		this.loser = loser;
+	}
+}
+async function convertOldGames() {
+	console.log("updating...");
+	for (var i = 0; i < games.baseball.length; i++) {
+		if (!games.baseball[i].winner) {
+			await getData(games.baseball[i].url).then((data) => {
+				games.baseball[i].winner = new Object();
+				games.baseball[i].loser = new Object();
+				if (data.header.competitions[0].competitors[0].winner) {
+					games.baseball[i].winner.id = data.header.competitions[0].competitors[0].id
+					games.baseball[i].winner.logoURL = data.header.competitions[0].competitors[0].team.logos[0].href;
+					games.baseball[i].loser.id = data.header.competitions[0].competitors[1].id
+					games.baseball[i].loser.logoURL = data.header.competitions[0].competitors[1].team.logos[0].href;
+				} else {
+					games.baseball[i].loser.id = data.header.competitions[0].competitors[0].id
+					games.baseball[i].loser.logoURL = data.header.competitions[0].competitors[0].team.logos[0].href;
+					games.baseball[i].winner.id = data.header.competitions[0].competitors[1].id
+					games.baseball[i].winner.logoURL = data.header.competitions[0].competitors[1].team.logos[0].href;
+				}
+			});
+		}
+	}
+	localStorage.setItem("baseball",JSON.stringify(games.baseball));
+	for (var i = 0; i < games.basketball.length; i++) {
+		if (!games.basketball[i].winner) {
+			await getData(games.basketball[i].url).then((data) => {
+				games.basketball[i].winner = new Object();
+				games.basketball[i].loser = new Object();
+				if (data.header.competitions[0].competitors[0].winner) {
+					games.basketball[i].winner.id = data.header.competitions[0].competitors[0].id
+					games.basketball[i].winner.logoURL = data.header.competitions[0].competitors[0].team.logos[0].href;
+					games.basketball[i].loser.id = data.header.competitions[0].competitors[1].id
+					games.basketball[i].loser.logoURL = data.header.competitions[0].competitors[1].team.logos[0].href;
+				} else {
+					games.basketball[i].loser.id = data.header.competitions[0].competitors[0].id
+					games.basketball[i].loser.logoURL = data.header.competitions[0].competitors[0].team.logos[0].href;
+					games.basketball[i].winner.id = data.header.competitions[0].competitors[1].id
+					games.basketball[i].winner.logoURL = data.header.competitions[0].competitors[1].team.logos[0].href;
+				}
+			});
+		}
+	}
+	localStorage.setItem("basketball",JSON.stringify(games.basketball));
+	for (var i = 0; i < games.football.length; i++) {
+		if (!games.football[i].winner) {
+			await getData(games.football[i].url).then((data) => {
+				games.football[i].winner = new Object();
+				games.football[i].loser = new Object();
+				if (data.header.competitions[0].competitors[0].winner) {
+					games.football[i].winner.id = data.header.competitions[0].competitors[0].id
+					games.football[i].winner.logoURL = data.header.competitions[0].competitors[0].team.logos[0].href;
+					games.football[i].loser.id = data.header.competitions[0].competitors[1].id
+					games.football[i].loser.logoURL = data.header.competitions[0].competitors[1].team.logos[0].href;
+				} else {
+					games.football[i].loser.id = data.header.competitions[0].competitors[0].id
+					games.football[i].loser.logoURL = data.header.competitions[0].competitors[0].team.logos[0].href;
+					games.football[i].winner.id = data.header.competitions[0].competitors[1].id
+					games.football[i].winner.logoURL = data.header.competitions[0].competitors[1].team.logos[0].href;
+				}
+			});
+		}
+	}
+	localStorage.setItem("football",JSON.stringify(games.football));
+	for (var i = 0; i < games.hockey.length; i++) {
+		if (!games.hockey[i].winner) {
+			await getData(games.hockey[i].url).then((data) => {
+				games.hockey[i].winner = new Object();
+				games.hockey[i].loser = new Object();
+				if (data.header.competitions[0].competitors[0].winner) {
+					games.hockey[i].winner.id = data.header.competitions[0].competitors[0].id
+					games.hockey[i].winner.logoURL = data.header.competitions[0].competitors[0].team.logos[0].href;
+					games.hockey[i].loser.id = data.header.competitions[0].competitors[1].id
+					games.hockey[i].loser.logoURL = data.header.competitions[0].competitors[1].team.logos[0].href;
+				} else {
+					games.hockey[i].loser.id = data.header.competitions[0].competitors[0].id
+					games.hockey[i].loser.logoURL = data.header.competitions[0].competitors[0].team.logos[0].href;
+					games.hockey[i].winner.id = data.header.competitions[0].competitors[1].id
+					games.hockey[i].winner.logoURL = data.header.competitions[0].competitors[1].team.logos[0].href;
+				}
+			});
+		}
+	}
+	localStorage.setItem("hockey",JSON.stringify(games.hockey));
+	for (var i = 0; i < games.soccer.length; i++) {
+		if (!games.soccer[i].winner) {
+			await getData(games.soccer[i].url).then((data) => {
+				games.soccer[i].winner = new Object();
+				games.soccer[i].loser = new Object();
+				if (data.header.competitions[0].competitors[0].winner) {
+					games.soccer[i].winner.id = data.header.competitions[0].competitors[0].id
+					games.soccer[i].winner.logoURL = data.header.competitions[0].competitors[0].team.logos[0].href;
+					games.soccer[i].loser.id = data.header.competitions[0].competitors[1].id
+					games.soccer[i].loser.logoURL = data.header.competitions[0].competitors[1].team.logos[0].href;
+				} else {
+					games.soccer[i].loser.id = data.header.competitions[0].competitors[0].id
+					games.soccer[i].loser.logoURL = data.header.competitions[0].competitors[0].team.logos[0].href;
+					games.soccer[i].winner.id = data.header.competitions[0].competitors[1].id
+					games.soccer[i].winner.logoURL = data.header.competitions[0].competitors[1].team.logos[0].href;
+				}
+			});
+		}
+	}
+	localStorage.setItem("soccer",JSON.stringify(games.soccer));
+}
+function getWinLossInfo(competitors) {
+	var retStr = "";
+	var win = competitors.filter(e => e.winner)[0];
+	var loss = competitors.filter(e => !e.winner)[0];
+	retStr+= win.id + "','"+win.team.logos[0].href+"','"+loss.id+"','"+loss.team.logos[0].href;
+	return retStr;
 }
