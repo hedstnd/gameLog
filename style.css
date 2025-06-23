@@ -37,20 +37,22 @@ li:last-child {
 }
 
 #bot-bar {
-	width: 100%;
+	width: 75%;
 	position: fixed;
-	left: 0px;
-	bottom: 0px;
+	left: 10px;
+	bottom: 30px;
 	padding-bottom: 1.5rem;
-	height: 4rem;
+	height: 2rem;
 	backdrop-filter: blur(30px);
 	-webkit-backdrop-filter: blur(30px);
-	font-size: 3vw;
+	font-size: 2rem !important;
 	font-family: 'San Francisco';
+	background-color: rgba(255,255,255,0.1);
+	border-radius: 30px;
 }
 #bot-bar .activeTab {
-	/*background-color: rgba(128,128,128,0.4);*/
-	color: blue;/*rgb(0,132,255);*/
+	background-color: rgba(255,255,255,0.2);
+	/* color: blue;*/ 
 }
 .tab::after {
 	/*width: 25%;*/
@@ -62,6 +64,7 @@ li:last-child {
 	display: inline-block;
 	height: 100%;
 	padding-bottom: 1rem;
+	padding-top: .5rem;
 }
 .add {
 	display: none;
@@ -78,22 +81,22 @@ li:last-child {
 #hm::before {
 	content: "\e88a\A";
 	font-family: 'Material Symbols Outlined';
-	font-size: 2.5rem;
+	/* font-size: 2.5rem; */
 }
 #adG::before {
 	content: "\e145\A";
 	font-family: 'Material Symbols Outlined';
-	font-size: 2.5rem;
+	/* font-size: 2.5rem; */
 }
 #rem::before {
 	content: "\e872\A";
 	font-family: 'Material Symbols Outlined';
-	font-size: 2.5rem;
+	/* font-size: 2.5rem; */
 }
 #fou::before {
 	content: "\e8b8\A";
 	font-family: 'Material Symbols Outlined';
-	font-size: 2.5rem;
+	/* font-size: 2.5rem; */
 }
 
 #icons {
@@ -325,7 +328,7 @@ ul {
 #winLoss::before {
 	content: "\f20c\A";
 	font-family: 'Material Symbols Outlined';
-	font-size: 2.5rem;
+	/* font-size: 2.5rem; */
 }
 .recTile {
 	width: 46dvw;
@@ -357,4 +360,12 @@ ul {
 /* } */
 #teamWL h3 {
 	width: 100%;
+}
+#hm {
+	border-top-left-radius: 30px;
+	border-bottom-left-radius: 30px;
+}
+#fou {
+	border-top-right-radius: 30px;
+	border-bottom-right-radius: 30px;
 }

@@ -2,7 +2,8 @@
 // let lg = document.getElementById("league");
 // let dd = document.getElementById("dropDown");
 var games = new Object();
-var appVer = "2.1.1";
+var appVer = "2.2";
+var  fr = new FileReader();
 g = [];
 d = new Date();
 window.onload = function() {
@@ -38,7 +39,25 @@ window.onload = function() {
 	version.innerText = "GameLog " + appVer;
 	document.getElementById("set").appendChild(version);
 	findTeamRecs();
+	var gamesStr = "data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(games));
+	document.getElementById("dwnld").setAttribute("href",gamesStr);
+	document.getElementById("dwnld").setAttribute("download","gameLog-"+d.toISOString().substring(0,10)+".json");
 }
+  // fr.onload = function(e) { 
+  // console.log(e);
+    // var result = JSON.parse(e.target.result);
+    // var formatted = JSON.stringify(result, null, 2);
+        // document.getElementById('result').value = formatted;
+	// games = JSON.parse(e.target.result);
+	// localStorage.setItem("baseball",JSON.stringify(games.baseball));
+	// localStorage.setItem("basketball",JSON.stringify(games.basketball));
+	// localStorage.setItem("football",JSON.stringify(games.football));
+	// localStorage.setItem("soccer",JSON.stringify(games.soccer));
+	// localStorage.setItem("hockey",JSON.stringify(games.hockey));
+  // }
+
+  // fr.readAsText(files.item(0));
+// }
 games.nba = [];
 games.mlb = [];
 games.nfl = [];
@@ -58,6 +77,19 @@ names.set("nfl","NFL");
 names.set("mlb","MLB");
 names.set("nhl","NHL");
 names.set("nba","NBA");
+function loadFile() {
+	const reader = new FileReader();
+	reader.addEventListener("load",() => {
+		games = JSON.parse(reader.result);
+		localStorage.setItem("baseball",JSON.stringify(games.baseball));
+		localStorage.setItem("basketball",JSON.stringify(games.basketball));
+		localStorage.setItem("football",JSON.stringify(games.football));
+		localStorage.setItem("hockey",JSON.stringify(games.hockey));
+		localStorage.setItem("soccer",JSON.stringify(games.soccer));
+	});
+	var [toRead] = document.getElementById("selectFiles").files;
+	reader.readAsText(toRead);
+}
 async function setLg() {
 	// opts = lgOpts.get(document.getElementById("dropDown").value);
 	getData("https://site.api.espn.com/apis/site/v2/leagues/dropdown?lang=en&region=us&calendartype=whitelist&limit=1000&sport="+document.getElementById("dropDown").value).then((opts) => {

@@ -54,6 +54,8 @@
 			<li><button id="sBut" onclick="share()">Share GameLog</button></li>
 			<li><button onclick="window.location.reload(true)">Update/Reload</button></li>
 			<li><button onclick="convertOldGames()">Add Win/Loss Data for Old Games</button>
+			<li><a id="dwnld"><button>Export Games</button></a></li>
+			<li>Import Games<input type="file" id="selectFiles" value="Import" onchange="loadFile()"/></li>
 			<!--<li>Notifications (WIP)</li>-->
 		</ul>
 	</span>
@@ -71,7 +73,7 @@
 		<table class="homeBox" id="homePitching"></table>
 	</span>
 	</div>
-	<div id="bot-bar"><span id="hm" class="tab activeTab">Home</span><span id="adG" class="tab">Add Game</span><span id="winLoss" class="tab">Records</span><span id="rem" class="tab">Remove Game</span><span id="fou" class="tab">Settings</span></div>
+	<div id="bot-bar"><span id="hm" class="tab activeTab"></span><span id="adG" class="tab"></span><span id="winLoss" class="tab"></span><span id="rem" class="tab"></span><span id="fou" class="tab"></span></div>
   <!--
   This script places a badge on your repl's full-browser view back to your repl's cover
   page. Try various colors for the theme: dark, light, red, orange, yellow, lime, green,
