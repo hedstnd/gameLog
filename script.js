@@ -2,7 +2,7 @@
 // let lg = document.getElementById("league");
 // let dd = document.getElementById("dropDown");
 var games = new Object();
-var appVer = "2.2";
+var appVer = "2.2.1";
 var  fr = new FileReader();
 g = [];
 d = new Date();
@@ -144,12 +144,12 @@ function findGames() {
 			ins = "";
 			if (game.events[i].competitions[0].status.type.completed) {
 			if (league.includes("college")) {
-		ins += game.events[i].competitions[0].competitors[1].team.nickname + " " + game.events[i].competitions[0].competitors[1].score.value + " @ " + game.events[i].competitions[0].competitors[0].team.nickname + " " + game.events[i].competitions[0].competitors[0].score.value;
+		ins += game.events[i].competitions[0].competitors[1].team.nickname.replaceAll("'","’") + " " + game.events[i].competitions[0].competitors[1].score.value + " @ " + game.events[i].competitions[0].competitors[0].team.nickname.replaceAll("'","’") + " " + game.events[i].competitions[0].competitors[0].score.value;
 			} else {
 			ins += game.events[i].competitions[0].competitors[1].team.shortDisplayName + " " + game.events[i].competitions[0].competitors[1].score.value + " @ " + game.events[i].competitions[0].competitors[0].team.shortDisplayName + " " + game.events[i].competitions[0].competitors[0].score.value;
 			}
 		// var aposRemove = false;
-		if (game.events[i].competitions[0].notes && game.events[i].competitions[0].notes[0]) {
+		if (game.events[i].competitions[0].notes && game.events[i].competitions[0].notes[0] && game.events[i].competitions[0].notes[0].headline) {
 			ins+= (" ["+ game.events[i].competitions[0].notes[0].headline + "]").replaceAll("'","’").replaceAll(" - "," ");
 		}
 				ins+=" - "+new Date(game.events[i].competitions[0].date).toLocaleDateString();
@@ -279,7 +279,9 @@ async function findTeams() {
 		/*g.open("GET",*/url="https://site.api.espn.com/apis/site/v2/sports/football/college-football/teams?groupType=conference&enable=groups&groups=80";
 	} else if (document.getElementById("league").value == "mens-college-basketball") {
 		/*g.open("GET",*/url="https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/teams?groupType=conference&enable=groups&groups=50";
-	} else {
+	} else if (document.getElementById("league").value == "womens-college-basketball") {
+		/*g.open("GET",*/url="https://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/teams?groupType=conference&enable=groups&groups=50";
+	}	else {
 		/*g.open("GET",*/url="https://site.api.espn.com/apis/site/v2/sports/"+document.getElementById("dropDown").value+"/"+document.getElementById("league").value+"/teams";
 	}
 	/*g.responseType='json';
