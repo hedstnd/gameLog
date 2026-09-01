@@ -2,7 +2,7 @@
 // let lg = document.getElementById("league");
 // let dd = document.getElementById("dropDown");
 var games = new Object();
-var appVer = "2.2.1";
+var appVer = "2.3.0";
 var  fr = new FileReader();
 g = [];
 d = new Date();
@@ -115,7 +115,7 @@ function setYr() {
 		d++;
 	}
 	document.getElementById("season").innerHTML = "<option value=\"\">Select Year</option>";
-	for (var i = 2000; i <= d; i++) {
+	for (var i = d; i >= 2000; i--) {
 		yr = document.createElement("option");
 		yr.setAttribute("value",""+i);
 		yr.innerText = i;
@@ -274,49 +274,66 @@ async function printGames(sport,league="") {
 async function findTeams() {
 	document.getElementById("teamSel").innerHTML = "<option value=\"\">Select a Team</option>";
 	g = new XMLHttpRequest();
-	url = "";
-	if (document.getElementById("league").value == "college-football") {
-		/*g.open("GET",*/url="https://site.api.espn.com/apis/site/v2/sports/football/college-football/teams?groupType=conference&enable=groups&groups=80";
-	} else if (document.getElementById("league").value == "mens-college-basketball") {
-		/*g.open("GET",*/url="https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/teams?groupType=conference&enable=groups&groups=50";
-	} else if (document.getElementById("league").value == "womens-college-basketball") {
-		/*g.open("GET",*/url="https://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/teams?groupType=conference&enable=groups&groups=50";
-	}	else {
-		/*g.open("GET",*/url="https://site.api.espn.com/apis/site/v2/sports/"+document.getElementById("dropDown").value+"/"+document.getElementById("league").value+"/teams";
-	}
-	/*g.responseType='json';
-	g.onload = function() {
-		console.log(g.response);*/
+	url = "https://site.web.api.espn.com/apis/v2/sports/"+document.getElementById("dropDown").value+"/"+lg.value+"/standings?group=0&sort=alpha:asc";
 	e = await fetch(url);
-		if (document.getElementById("league").value.includes("college") && (document.getElementById("league").value.includes("basket") || document.getElementById("league").value.includes("foot"))) {
-			l = await e.json();
-			confs = l.sports[0].leagues[0].groups;//g.response.sports[0].leagues[0].groups;
-			console.log(confs);
-			for (var i = 0; i < confs.length; i++) {
-				head = document.createElement("optgroup");
-				head.setAttribute("label",confs[i].midsizeName);
-				document.getElementById("teamSel").appendChild(head);
-				for (var j = 0; j < confs[i].teams.length; j++) {
-					tmName = document.createElement("option");
-					tmName.setAttribute("value",confs[i].teams[j].id);
-					tmName.innerText = confs[i].teams[j].nickname;
-					document.getElementById("teamSel").appendChild(tmName);
+	l = await e.json();
+	if (l.children.length > 0) {
+		for (var i = 0; i < l.children.length; i++) {
+			var header = document.createElement("optgroup");
+			header.setAttribute("label",l.children[i].shortName || l.children[i].abbreviation);
+			var teams;
+			if (l.children[i].standings) {
+				teams = l.children[i].standings.entries;
+			} else {
+				teams = l.children[i].children.map(x => x.standings.entries);
+				var teamsConcat = teams[0];
+				for (var j = 0; j < teams.length; j++) {
+					teamsConcat = teamsConcat.concat(teams[j]);
 				}
+				teams = teamsConcat;
 			}
-		} else {
-			t = await e.json();
-			console.log(t);
-			teams = t.sports[0].leagues[0].teams;//g.response.sports[0].leagues[0].teams;
-			for (var i = 0; i < teams.length; i++) {
-				tmName = document.createElement("option");
-				tmName.value = teams[i].team.id;
-				tmName.innerText = teams[i].team.displayName;
-				document.getElementById("teamSel").appendChild(tmName);
+			for (var j = 0; j < teams.length; j++) {
+				var opt = document.createElement("option");
+				opt.value = teams[j].team.id;
+				opt.innerText = teams[j].team.shortDisplayName;
+				header.appendChild(opt);
 			}
+			document.getElementById("teamSel").appendChild(header);
 		}
-	//}
-	// g.send()
+	} else {
+		for (var i = 0; i < l.standings.entries.length; i++) {
+			// var header = document.createElement("optgroup");
+			// header.setAttribute("label",l.standings.entries[i].shortName || l.standings.entries[i].abbreviation);
+			var opt = document.createElement("option");
+			opt.value = l.standings.entries[i].team.id;
+			opt.innerText = l.standings.entries[i].team.shortDisplayName;
+			// header.appendChild(opt);
+			document.getElementById("teamSel").appendChild(opt);
+		}
+	}
 }
+
+async function setTm() {
+	var sport = document.getElementById("dropDown").value;
+	var tms = await fetch("https://site.web.api.espn.com/apis/v2/sports/"+sport+"/"+lg.value+"/standings?group="+document.getElementById("teamSel").value+"&sort=alpha:asc");
+	tms = await tms.json();
+	console.log(tms);
+	var teamList;
+	var hasChildren = tms.children.length > 0;
+	if (hasChildren) {
+		
+	}
+	else {
+		teamList= tms.standings.entries;
+		for (var i = 0; i < teamList.length; i++) {
+			var listEntry = document.createElement("option");
+			listEntry.value = teamList[i].team.id;
+			listEntry.innerText = teamList[i].team.shortDisplayName;
+			document.getElementById("teamPick").appendChild(listEntry);
+		}
+	}
+}
+
 function addGame(title, time, sport, league,id, winnerId, winnerURL, loserId, loserURL) {
 	b = document.getElementById("" + id).children[0];
 	b.setAttribute("disabled","true");
@@ -989,13 +1006,21 @@ function getWinLossInfo(competitors) {
 	try {
 		retStr+= win.id + "','"+win.team.logos[0].href;
 	} catch (err) {
-		retStr+= win.id+"','null";
+		if (win) {
+			retStr+= win.id+"','null";
+		} else {
+			retStr+= "-1','null"
+		}
 	}
 	retStr+= "','";
 	try {
 		retStr+= loss.id+"','"+loss.team.logos[0].href;
 	} catch (err) {
-		retStr+= loss.id+"','null";
+		if (loss) {
+			retStr+= loss.id+"','null";
+		} else {
+			retStr+= "-1','null";
+		}
 	}
 	return retStr;
 }
