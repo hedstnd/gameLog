@@ -2,7 +2,7 @@
 // let lg = document.getElementById("league");
 // let dd = document.getElementById("dropDown");
 var games = new Object();
-var appVer = "2.3.0";
+var appVer = "2.3.1";
 var  fr = new FileReader();
 g = [];
 d = new Date();
@@ -105,7 +105,14 @@ async function setLg() {
 		if (!games[opts.leagues[i].slug.replaceAll("-","")]) {
 			games[opts.leagues[i].slug.replaceAll("-","")] = [];
 		}
-	}});
+	}
+	if (document.getElementById("dropDown").value == "football") {
+		op = document.createElement("option");
+		op.value = "college-football-d2d3";
+		op.innerText = "NCAAF (D2/D3)";
+		lg.appendChild(op);
+	}
+	});
 }
 function setYr() {
 	da = new Date();
@@ -274,9 +281,22 @@ async function printGames(sport,league="") {
 async function findTeams() {
 	document.getElementById("teamSel").innerHTML = "<option value=\"\">Select a Team</option>";
 	g = new XMLHttpRequest();
-	url = "https://site.web.api.espn.com/apis/v2/sports/"+document.getElementById("dropDown").value+"/"+lg.value+"/standings?group=0&sort=alpha:asc";
+	var isCFB = false;
+	if (lg.value == "college-football") {
+		url = "https://site.web.api.espn.com/apis/v2/sports/"+document.getElementById("dropDown").value+"/"+lg.value+"/standings?group=90&sort=alpha:asc";
+		isCFB = true;
+	} else if (lg.value  == "college-football-d2d3") {
+		url = "https://site.web.api.espn.com/apis/v2/sports/football/college-football/standings?group=35&sort=alpha:asc";
+		lg.value = "college-football";
+	}
+	else {
+		url = "https://site.web.api.espn.com/apis/v2/sports/"+document.getElementById("dropDown").value+"/"+lg.value+"/standings?group=0&sort=alpha:asc";
+	}
 	e = await fetch(url);
 	l = await e.json();
+	if (isCFB) {
+		l.children = l.children[0].children.concat(l.children[1].children);
+	}
 	if (l.children.length > 0) {
 		for (var i = 0; i < l.children.length; i++) {
 			var header = document.createElement("optgroup");
